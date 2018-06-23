@@ -24,7 +24,7 @@ class TraitsSpec extends FunSuite with Matchers {
   test(
     """You can extends from a trait that was not built in to begin with, be
       |  careful that the trait is instantiated first, and may still not
-      |  have a desired effect.""".stripMargin) {
+      |  have a dedsired effect.""".stripMargin) {
 
     pending
   }

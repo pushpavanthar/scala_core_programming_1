@@ -10,7 +10,11 @@ class ClassesSpec extends FunSuite with Matchers {
       |  the function for date is wonderful
       |  for unit testing. You can also set the constructor
       |  to protected""".stripMargin) {
-    pending
+    val stamp = Stamp("Jimi Hendrix", 2014)
+
+    stamp.name should be ("Jimi Hendrix")
+    stamp.year should be (2014)
+    stamp.age should be (4)
   }
 
   test(
@@ -24,15 +28,21 @@ class ClassesSpec extends FunSuite with Matchers {
     """Case classes have automatic functionality for getters, toString,
           equals, hashCode, apply,
           and basic pattern matching""".stripMargin) {
-    pending
+    val computer = Computer("Comodor", "64", 1983)
+    val computer2 = computer.copy(model = "128", year=1986)
+
+    computer2.year should be (1986)
+    computer.year should be (1983)
   }
 
   test("Preconditions can be made with require and are used in the class") {
-    pending
+    val exception = the [IllegalArgumentException] thrownBy {
+      val stamp = Stamp("", 1912)
+    }
   }
 
   test("Subclassing in Scala") {
-    pending
+    new SportsCard(1985, "Topps", "Ken Griffey Jr.")
   }
 
   test("Abstract Classes in Scala") {
@@ -44,6 +54,6 @@ class ClassesSpec extends FunSuite with Matchers {
   }
 
   test("Generic Classes in Scala with our own map") {
-    pending
+      pending
   }
 }

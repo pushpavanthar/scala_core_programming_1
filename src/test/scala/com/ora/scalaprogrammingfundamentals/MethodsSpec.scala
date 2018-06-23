@@ -33,42 +33,91 @@ class MethodsSpec extends FunSuite with Matchers {
       |  is a long way attempt to do division in a
       |  recursive style""".stripMargin) {
 
-    pending
+    def divide(numberator:Int, denominator:Int):Option[Int] = {
+      def divideHelper(num:Int, den:Int, count:Int): Option[Int] = {
+        if(num == 0) Some(count)
+        else if(num < den ) Some(count)
+        else divideHelper(num - den, den, count + 1)
+      }
+      if(denominator == 0) None
+      else divideHelper(numberator, denominator, 0)
+    }
+
+    divide(1, 0) should be (None)
+    divide(1,1) should be (Some(1))
+    divide(4,2) should be (Some(2))
   }
 
   test("""Multi-parameter lists are groups or argument lists,
       |  the purpose are two fold: The get group like terms, and
       |  they make it easy to be partially applied, another reason is
       |  for implicits""".stripMargin) {
-     pending
+     def foo(x:Int)(y:Int)(a:String, b:String): String = {
+       a + (x * y) +b
+     }
+
+    foo(3)(5)("<<<",">>>") should be ("<<<15>>>")
   }
 
   test("""Partial Applied Function with a multi-parameter list
       |  can be knocked out to provide only some of the entries, entries
       |  that you can fill in later""".stripMargin) {
 
-     pending
+    def foo(x:Int)(y:Int)(a:String, b:String): String = {
+      a + (x * y) +b
+    }
+
+    val fun:(String, String) => String = foo(4)(3)_
+
+    fun("$$$", "$$$") should be ("$$$12$$$")
+//    fun("$$$", "$$$") should be ("$$$12$$$")
   }
 
   test(
     """In multi-parameter lists you can use a function. Typically
       |  the function is in the last parameter group, but it's your code,
       |  you can put it wherever you please""".stripMargin) {
-    pending
+    def foo(x:Int, y:Int)(f:Function1[Int, String]) = f.apply(x * y)
+//    def foo(x:Int, y:Int)(f:Int => String) = f.apply(x * y) //shorthand for function1 which takes 2 generic arguments. 1 input type, 2 return type
+    val f1 = (i:Int) => s"The value is $i"
+
+    foo(40, 10)(f1)  should be ("The value is 400")
   }
 
   test(
     """You can also use functions as arguments in whatever
       |  parameter list group that you want. But being the nature of a function,
       |  a multiline function can be a block.""".stripMargin) {
-    pending
+    def foo(x:Int, y:Int)(f:Int => String) = f(x * y)
 
+    val result = foo(40, 10) { i =>
+      val add3 = i + 3
+      s"The value is $add3"
+    }
+
+    result should be ("The value is 403")
   }
 
   test("""What happens if I have a function as the last group in a
       |  multi parameter list and that function has no parameters?""".stripMargin) {
 
-    pending
+    def timer[A](f:() => A) = {
+      val startTime = System.currentTimeMillis()
+      val result = f() //its a by-name parameter. If parenthesises are removed we get compilation error
+      val endTime = System.currentTimeMillis()
+      (endTime - startTime, result)
+    }
+
+    val t = timer(() => {
+      Thread.sleep(4000)
+      50 + 10
+    })
+
+    val time = t._1
+    val item = t._2
+
+    time should (be >= 4000L and be <= 5000L)
+    item should be (60)
   }
 
 
@@ -81,7 +130,12 @@ class MethodsSpec extends FunSuite with Matchers {
 
 
   test("""Turning an method into a function""") {
-     pending
+     def foo(x:Int, y:Int, z:Int) = x + y + z
+    val f: (Int, Int, Int) => Int = foo _
+
+    f.apply(3, 5, 10) should be (18)
+
+    def myApply[T<: Ordered[T]](x:T, y:T) =  if(x > y) x else y
   }
 
   test(
@@ -89,7 +143,11 @@ class MethodsSpec extends FunSuite with Matchers {
       |  allow additional parameters and inside the method they
       |  are just a collection called WrappedArray""".stripMargin) {
 
-    pending
+    def zoom[A, B](a:A, rest:B*) = {
+      s"a:$a, rest:$rest"
+    }
+
+    zoom(3, "Hello", "World", "Scala") should be ("a:3, rest:WrappedArray(Hello, World, Scala)")
   }
 
   test(
@@ -97,7 +155,13 @@ class MethodsSpec extends FunSuite with Matchers {
       |  but the problem is what happens when we just send collection
       |  it would treat it as a single unit instead you can expand the units
       |  with a :_*""".stripMargin) {
-    pending
+    def zoom[A, B](a:A, rest:B*) = {
+      s"a:$a, rest:$rest"
+    }
+
+    zoom(3, List("Hello", "World", "Scala")) should be ("a:3, rest:WrappedArray(List(Hello, World, Scala))")
+    zoom(3, List("Hello", "World", "Scala"):_*) should be ("a:3, rest:List(Hello, World, Scala)")
+
   }
 
   test(
@@ -107,6 +171,15 @@ class MethodsSpec extends FunSuite with Matchers {
       |  is the named parameter. You can set a parameter
       |  explicitly by the name to avoid any confusion as to what you
       |  are setting""".stripMargin) {
-     pending
+//     def foo(x:Int)(y:Int)(a:String = "##", b:String = "##") = {
+//       a + (x + y) + b
+//     }
+//
+//    foo(3)(4)_ should be ("##7##")
+
+    def bar(x:Int, y:Int, a:String = "##", b:String = "##") = {
+      a + (x + y) + b
+    }
+    bar(10, 20) should be("##30##")
   }
 }
